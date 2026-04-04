@@ -1,0 +1,19 @@
+[project]
+name = "a11y-expert-mcp"
+version = "0.1.0"
+description = "Accessibility expert MCP server — helps developers build accessible components with WAI-ARIA patterns, code review, and WCAG guidance."
+readme = "README.md"
+authors = [
+    { name = "Elli", email = "el.patrick79@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.27.0",
+]
+
+[project.scripts]
+a11y-expert-mcp = "a11y_expert_mcp.server:main"
+
+[build-system]
+requires = ["uv_build>=0.10.12,<0.11.0"]
+build-backend = "uv_build"
