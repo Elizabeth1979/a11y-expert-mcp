@@ -61,6 +61,222 @@ def _find_relevant_patterns(query: str, max_results: int = 3) -> list[tuple[str,
 
 
 # ---------------------------------------------------------------------------
+# MCP Resources — knowledge base docs browsable by AI clients
+# ---------------------------------------------------------------------------
+
+
+@mcp.resource(
+    "a11y://patterns",
+    name="pattern-index",
+    title="All Accessibility Patterns",
+    description="Index of all WAI-ARIA component patterns in the knowledge base.",
+    mime_type="text/plain",
+)
+def resource_pattern_index() -> str:
+    """Return a list of all available patterns with brief descriptions."""
+    lines = [f"# Accessibility Pattern Index ({len(COMPONENT_NAMES)} components)\n"]
+    for name in COMPONENT_NAMES:
+        content = KNOWLEDGE[name]
+        # Extract first meaningful line as description
+        for line in content.splitlines():
+            stripped = line.strip().lstrip("#").strip()
+            if stripped and not stripped.startswith("---"):
+                lines.append(f"- **{name}**: {stripped[:120]}")
+                break
+        else:
+            lines.append(f"- **{name}**")
+    return "\n".join(lines)
+
+
+@mcp.resource(
+    "a11y://patterns/{component}",
+    name="pattern-detail",
+    title="Accessibility Pattern Detail",
+    description="Full WAI-ARIA pattern for a specific component (e.g., 'dialog modal', 'tabs', 'combobox').",
+    mime_type="text/markdown",
+)
+def resource_pattern_detail(component: str) -> str:
+    """Return the full knowledge base document for a specific component."""
+    results = _find_relevant_patterns(component, max_results=1)
+    if results:
+        name, content = results[0]
+        return f"# {name.title()} — Accessible Implementation Pattern\n\n{content}"
+    return (
+        f"No pattern found for '{component}'.\n\n"
+        f"Available: {', '.join(COMPONENT_NAMES)}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# MCP Prompts — guided workflows for common a11y tasks
+# ---------------------------------------------------------------------------
+
+
+@mcp.prompt(
+    name="audit-component",
+    title="Audit a Component for Accessibility",
+    description="Step-by-step accessibility audit for a UI component. Provide the code and optionally the component type.",
+)
+def prompt_audit_component(code: str, component_type: str = "") -> list[dict]:
+    """Generate a guided accessibility audit prompt."""
+    # Pull relevant patterns for context
+    search_query = component_type or code[:200]
+    relevant = _find_relevant_patterns(search_query, max_results=2)
+    pattern_context = ""
+    if relevant:
+        pattern_context = "\n\n## Reference Patterns\n\n"
+        for name, content in relevant:
+            pattern_context += f"### {name.title()}\n{content[:2000]}\n\n"
+
+    return [
+        {
+            "role": "user",
+            "content": (
+                f"Perform a thorough accessibility audit of this component.\n\n"
+                f"{'Component type: ' + component_type + chr(10) if component_type else ''}"
+                f"```\n{code}\n```\n\n"
+                f"Check for:\n"
+                f"1. ARIA roles, states, and properties — are they correct and complete?\n"
+                f"2. Keyboard interaction — can every action be done without a mouse?\n"
+                f"3. Focus management — is focus trapped/restored correctly?\n"
+                f"4. Screen reader announcements — will dynamic changes be announced?\n"
+                f"5. Color contrast and visual indicators\n"
+                f"6. Heading hierarchy and landmark structure\n"
+                f"7. Touch target size (minimum 44x44px)\n\n"
+                f"For each issue found, provide:\n"
+                f"- The specific WCAG criterion violated\n"
+                f"- The exact code fix\n"
+                f"- Why it matters for users"
+                f"{pattern_context}"
+            ),
+        }
+    ]
+
+
+@mcp.prompt(
+    name="make-accessible",
+    title="Make This Accessible",
+    description="Transform inaccessible code into a fully accessible implementation. Provide the code and what the component is.",
+)
+def prompt_make_accessible(code: str, component_type: str = "") -> list[dict]:
+    """Generate a prompt to make code accessible."""
+    relevant = _find_relevant_patterns(component_type or code[:200], max_results=2)
+    pattern_context = ""
+    if relevant:
+        pattern_context = "\n\n## WAI-ARIA Patterns to Follow\n\n"
+        for name, content in relevant:
+            pattern_context += f"### {name.title()}\n{content[:2000]}\n\n"
+
+    return [
+        {
+            "role": "user",
+            "content": (
+                f"Rewrite this code to be fully accessible following WAI-ARIA Authoring Practices.\n\n"
+                f"{'Component type: ' + component_type + chr(10) if component_type else ''}"
+                f"```\n{code}\n```\n\n"
+                f"Requirements:\n"
+                f"- Add all required ARIA roles, states, and properties\n"
+                f"- Implement full keyboard interaction per the WAI-ARIA pattern\n"
+                f"- Manage focus correctly (initial focus, focus trapping if modal, focus restoration)\n"
+                f"- Ensure screen reader announcements for dynamic content changes\n"
+                f"- Use semantic HTML elements where possible (button, nav, dialog, etc.)\n"
+                f"- Include aria-live regions for async updates\n\n"
+                f"Return the complete rewritten code with comments explaining each a11y addition."
+                f"{pattern_context}"
+            ),
+        }
+    ]
+
+
+@mcp.prompt(
+    name="check-form-accessibility",
+    title="Check Form Accessibility",
+    description="Audit a form for accessibility — labels, errors, validation, and keyboard flow.",
+)
+def prompt_check_form(code: str) -> list[dict]:
+    """Generate a form-specific accessibility audit prompt."""
+    return [
+        {
+            "role": "user",
+            "content": (
+                f"Audit this form for accessibility:\n\n"
+                f"```\n{code}\n```\n\n"
+                f"Check specifically for:\n"
+                f"1. **Labels**: Every input has a visible <label> with matching for/id (or aria-label for search/icon inputs)\n"
+                f"2. **Required fields**: Marked with aria-required=\"true\" and visually indicated (not just color)\n"
+                f"3. **Error handling**: Errors use aria-describedby, aria-invalid=\"true\", and an aria-live region for the error summary\n"
+                f"4. **Fieldsets**: Related inputs grouped with <fieldset> and <legend>\n"
+                f"5. **Autocomplete**: Appropriate autocomplete attributes for personal data fields\n"
+                f"6. **Tab order**: Logical focus flow, no tabindex > 0\n"
+                f"7. **Submit feedback**: Form submission status announced to screen readers\n"
+                f"8. **Instructions**: Input format hints linked via aria-describedby\n\n"
+                f"For each issue, provide the WCAG criterion and the exact fix."
+            ),
+        }
+    ]
+
+
+@mcp.prompt(
+    name="wcag-checklist",
+    title="WCAG Compliance Checklist",
+    description="Generate a WCAG 2.2 compliance checklist for a page or component. Specify the conformance level.",
+)
+def prompt_wcag_checklist(
+    description: str, level: str = "AA"
+) -> list[dict]:
+    """Generate a WCAG checklist prompt."""
+    return [
+        {
+            "role": "user",
+            "content": (
+                f"Generate a WCAG 2.2 Level {level} compliance checklist for:\n\n"
+                f"{description}\n\n"
+                f"Organize by WCAG principle (Perceivable, Operable, Understandable, Robust).\n"
+                f"For each criterion:\n"
+                f"- [ ] Criterion number and name\n"
+                f"- What to test\n"
+                f"- How to test it (tools + manual checks)\n"
+                f"- Common failures to watch for\n\n"
+                f"Focus on criteria most relevant to the described component/page.\n"
+                f"Skip criteria that clearly don't apply."
+            ),
+        }
+    ]
+
+
+@mcp.prompt(
+    name="aria-guide",
+    title="ARIA Implementation Guide",
+    description="Get a complete ARIA implementation guide for a specific component type.",
+)
+def prompt_aria_guide(component: str) -> list[dict]:
+    """Generate an ARIA implementation guide prompt with embedded knowledge."""
+    relevant = _find_relevant_patterns(component, max_results=1)
+    pattern_context = ""
+    if relevant:
+        name, content = relevant[0]
+        pattern_context = f"\n\n## Reference Pattern: {name.title()}\n\n{content}\n\n"
+
+    return [
+        {
+            "role": "user",
+            "content": (
+                f"I need to build an accessible **{component}** component.\n\n"
+                f"Provide a complete implementation guide covering:\n"
+                f"1. Which ARIA roles to use and where\n"
+                f"2. Required aria-* attributes and their values\n"
+                f"3. Keyboard interaction table (key → action)\n"
+                f"4. Focus management strategy\n"
+                f"5. Screen reader testing script (what to announce and when)\n"
+                f"6. Complete working code example\n"
+                f"7. Common mistakes to avoid"
+                f"{pattern_context}"
+            ),
+        }
+    ]
+
+
+# ---------------------------------------------------------------------------
 # MCP Tools
 # ---------------------------------------------------------------------------
 
