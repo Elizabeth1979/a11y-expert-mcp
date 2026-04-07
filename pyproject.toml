@@ -7,9 +7,27 @@ authors = [
     { name = "Elli", email = "el.patrick79@gmail.com" }
 ]
 requires-python = ">=3.11"
+license = "MIT"
+keywords = ["accessibility", "a11y", "mcp", "wcag", "wai-aria", "model-context-protocol"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Quality Assurance",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "Framework :: FastAPI",
+]
 dependencies = [
     "mcp[cli]>=1.27.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Elizabeth1979/a11y-expert-mcp"
+Repository = "https://github.com/Elizabeth1979/a11y-expert-mcp"
+Issues = "https://github.com/Elizabeth1979/a11y-expert-mcp/issues"
 
 [project.scripts]
 a11y-expert-mcp = "a11y_expert_mcp.server:main"

@@ -1,5 +1,8 @@
 # A11y Expert MCP
 
+[![PyPI version](https://img.shields.io/pypi/v/a11y-expert-mcp)](https://pypi.org/project/a11y-expert-mcp/)
+[![Python 3.11+](https://img.shields.io/pypi/pyversions/a11y-expert-mcp)](https://pypi.org/project/a11y-expert-mcp/)
+
 An accessibility expert for your AI coding assistant. This [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server gives AI tools like Claude, Cursor, and Windsurf real-time access to WAI-ARIA patterns, code review, contrast checking, and WCAG guidance — so the code they write is accessible from the start.
 
 ## What's Inside
