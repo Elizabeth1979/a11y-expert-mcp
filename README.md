@@ -9,40 +9,42 @@ An accessibility expert for your AI coding assistant. This [MCP (Model Context P
 
 ### 🔧 Tools
 
-| Tool | What it does |
-|------|-------------|
-| **`get_pattern`** | Get the full WAI-ARIA implementation pattern for any UI component — roles, states, keyboard interaction, and code examples. |
-| **`review_code`** | Paste HTML/JSX/TSX/Vue/Svelte code and get a list of accessibility issues with specific fixes and WCAG references. Detects 10+ anti-patterns including missing labels, click-on-divs, broken heading hierarchy, missing dialog roles, and more. |
-| **`list_patterns`** | See all 33 component patterns available in the knowledge base. |
-| **`check_contrast`** | Check any two hex colors against WCAG AA and AAA contrast requirements for both normal and large text. |
+| Tool                 | What it does                                                                                                                                                                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`get_pattern`**    | Get the full WAI-ARIA implementation pattern for any UI component — roles, states, keyboard interaction, and code examples.                                                                                                                     |
+| **`review_code`**    | Paste HTML/JSX/TSX/Vue/Svelte code and get a list of accessibility issues with specific fixes and WCAG references. Detects 10+ anti-patterns including missing labels, click-on-divs, broken heading hierarchy, missing dialog roles, and more. |
+| **`list_patterns`**  | See all 33 component patterns available in the knowledge base.                                                                                                                                                                                  |
+| **`check_contrast`** | Check any two hex colors against WCAG AA and AAA contrast requirements for both normal and large text.                                                                                                                                          |
 
 ### 📚 Knowledge Base (33 Components)
 
 Every pattern comes from the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/) and includes roles, states, properties, keyboard interaction, and code examples.
 
-| | | | |
-|---|---|---|---|
-| Accordion | Alert | Alert Dialog | Breadcrumbs |
-| Buttons | Carousel | Checkbox | Combobox |
-| Dialog (Modal) | Disclosure | Feed | Grid |
-| Headings | Image Labeling | Landmarks | Link |
-| Listbox | Menu | Menu Button | Meter |
-| Radio | Slider | Slider (Multi-thumb) | Spinbutton |
-| Switch | Tables | Tabs | Toolbar |
-| Tooltip | Treeview | Treegrid | Window Splitter |
-| Accessibility (General) | | | |
+> **Canonical source:** The 33 pattern instruction files in this server are synced from [`a11y-skills`](https://github.com/Elizabeth1979/a11y-skills), the community-maintained source of truth. If you want to contribute a new pattern or improve an existing one, open the PR there.
+
+|                         |                |                      |                 |
+| ----------------------- | -------------- | -------------------- | --------------- |
+| Accordion               | Alert          | Alert Dialog         | Breadcrumbs     |
+| Buttons                 | Carousel       | Checkbox             | Combobox        |
+| Dialog (Modal)          | Disclosure     | Feed                 | Grid            |
+| Headings                | Image Labeling | Landmarks            | Link            |
+| Listbox                 | Menu           | Menu Button          | Meter           |
+| Radio                   | Slider         | Slider (Multi-thumb) | Spinbutton      |
+| Switch                  | Tables         | Tabs                 | Toolbar         |
+| Tooltip                 | Treeview       | Treegrid             | Window Splitter |
+| Accessibility (General) |                |                      |                 |
 
 ### 💬 Prompts
 
 Pre-built workflows your AI assistant can use:
 
-| Prompt | What it does |
-|--------|-------------|
-| **`audit-component`** | Step-by-step accessibility audit — checks ARIA, keyboard, focus, contrast, headings, touch targets. Provide code + optional component type. |
-| **`make-accessible`** | Rewrites inaccessible code into a fully accessible implementation with WAI-ARIA patterns and comments explaining every change. |
-| **`check-form-accessibility`** | Form-specific audit — labels, required fields, error handling, fieldsets, autocomplete, tab order, and submit feedback. |
-| **`wcag-checklist`** | Generates a WCAG 2.2 compliance checklist (AA or AAA) organized by principle, tailored to your page or component. |
-| **`aria-guide`** | Complete ARIA implementation guide for a component — roles, attributes, keyboard table, focus management, screen reader script, and code example. |
+| Prompt                         | What it does                                                                                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`audit-component`**          | Step-by-step accessibility audit — checks ARIA, keyboard, focus, contrast, headings, touch targets. Provide code + optional component type.       |
+| **`make-accessible`**          | Rewrites inaccessible code into a fully accessible implementation with WAI-ARIA patterns and comments explaining every change.                    |
+| **`check-form-accessibility`** | Form-specific audit — labels, required fields, error handling, fieldsets, autocomplete, tab order, and submit feedback.                           |
+| **`wcag-checklist`**           | Generates a WCAG 2.2 compliance checklist (AA or AAA) organized by principle, tailored to your page or component.                                 |
+| **`aria-guide`**               | Complete ARIA implementation guide for a component — roles, attributes, keyboard table, focus management, screen reader script, and code example. |
 
 ### 📖 Resources
 
@@ -108,7 +110,12 @@ Or if running from source:
   "mcpServers": {
     "a11y": {
       "command": "uv",
-      "args": ["run", "--project", "/path/to/a11y-expert-mcp", "a11y-expert-mcp"]
+      "args": [
+        "run",
+        "--project",
+        "/path/to/a11y-expert-mcp",
+        "a11y-expert-mcp"
+      ]
     }
   }
 }
@@ -123,18 +130,22 @@ Use the same `command` and `args` — check your editor's MCP configuration docs
 Once connected, your AI assistant can:
 
 **Get an accessible pattern:**
+
 > "How do I build an accessible tabs component?"
 > → The assistant calls `get_pattern("tabs")` and gets the full WAI-ARIA pattern with keyboard interaction and code.
 
 **Review code for issues:**
+
 > "Check this modal for accessibility problems"
 > → The assistant calls `review_code(code, component_type="modal")` and gets specific issues with fixes.
 
 **Check color contrast:**
+
 > "Does #666 on #fff pass WCAG?"
 > → The assistant calls `check_contrast("#666", "#fff")` and gets AA/AAA results for normal and large text.
 
 **Generate a WCAG checklist:**
+
 > "Give me a WCAG AA checklist for my checkout page"
 > → The assistant uses the `wcag-checklist` prompt to generate a tailored compliance checklist.
 
@@ -149,6 +160,14 @@ No external API calls. No database. Everything runs locally.
 - [MCP SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP)
 - Python 3.11+
 - WAI-ARIA Authoring Practices knowledge base (bundled markdown files)
+
+## Related tools
+
+Part of a broader accessibility engineering toolkit. Pair this with:
+
+- **[`screen-reader-cli`](https://github.com/Elizabeth1979/screen-reader-cli)** — CLI for screen-reader-driven testing. Where `a11y-expert-mcp` gives your AI assistant static guidance (patterns, code review), `screen-reader-cli` runs live screen-reader checks against real pages using Virtual Screen Reader + Playwright. Static + runtime = full coverage.
+- **[`a11y-skills`](https://github.com/Elizabeth1979/a11y-skills)** — Canonical source for the pattern instruction files this server serves.
+- **[`a11y-engineering-toolkit`](https://github.com/Elizabeth1979/a11y-engineering-toolkit)** — Umbrella repo with browser-side audit panel + UX widget, plus the full portfolio map.
 
 ## License
 
