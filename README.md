@@ -1,5 +1,8 @@
 # A11y Expert MCP
 
+> [!IMPORTANT]
+> **Archived.** Superseded by [accessibility-evidence-engine](https://github.com/Elizabeth1979/accessibility-evidence-engine). Its pattern lookup lives on there as the `explain` tool of [`@aee/mcp`](https://github.com/Elizabeth1979/accessibility-evidence-engine#coding-agents-mcp), which reads the patterns from [a11y-skills](https://github.com/Elizabeth1979/a11y-skills), their one source. This repository is read-only and kept for its history.
+
 [![PyPI version](https://img.shields.io/pypi/v/a11y-expert-mcp)](https://pypi.org/project/a11y-expert-mcp/)
 [![Python 3.11+](https://img.shields.io/pypi/pyversions/a11y-expert-mcp)](https://pypi.org/project/a11y-expert-mcp/)
 
